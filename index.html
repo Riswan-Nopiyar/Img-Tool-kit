@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NPRIMG — Image Toolkit</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-npr">NPR</span><span class="logo-img">IMG</span>
+      <div class="logo-dot"></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-tab="compress">Compress</button>
+      <button class="nav-btn" data-tab="convert">Convert</button>
+      <button class="nav-btn" data-tab="resize">Resize</button>
+      <button class="nav-btn" data-tab="crop">Crop</button>
+      <button class="nav-btn" data-tab="filter">Filter</button>
+      <button class="nav-btn" data-tab="watermark">Watermark</button>
+    </nav>
+    <div class="header-badge">
+      <span class="badge-dot"></span>
+      <span>JS-Powered</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Upload Zone -->
+    <section class="upload-section">
+      <div class="upload-zone" id="dropZone">
+        <div class="upload-inner">
+          <div class="upload-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 8L20 24H28V40H36V24H44L32 8Z" fill="currentColor"/>
+              <path d="M12 48H52V56H12V48Z" fill="currentColor" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="upload-text">
+            <p class="upload-title">Drop images here</p>
+            <p class="upload-sub">or <label for="fileInput" class="file-label">browse files</label></p>
+            <p class="upload-formats">JPG · PNG · WebP · GIF · BMP · TIFF · AVIF · ICO · SVG</p>
+          </div>
+          <input type="file" id="fileInput" multiple accept="image/*" hidden />
+        </div>
+        <div class="drop-overlay">
+          <span>Release to Upload</span>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="statsBar" style="display:none">
+        <div class="stat-item">
+          <span class="stat-val" id="statCount">0</span>
+          <span class="stat-label">Files</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-val" id="statSize">0 KB</span>
+          <span class="stat-label">Total Size</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <span class="stat-val" id="statFormats">—</span>
+          <span class="stat-label">Formats</span>
+        </div>
+        <div class="stat-sep"></div>
+        <button class="clear-btn" id="clearAllBtn">Clear All</button>
+      </div>
+    </section>
+
+    <!-- Tool Panels -->
+    <section class="tool-section">
+
+      <!-- COMPRESS -->
+      <div class="tool-panel active" id="panel-compress">
+        <div class="panel-header">
+          <h2>Compress <span class="panel-tag">Reduce file size</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="control-group">
+            <label>Quality <span class="ctrl-val" id="qualityVal">80%</span></label>
+            <input type="range" id="qualitySlider" min="10" max="100" value="80" class="slider" />
+            <div class="range-labels"><span>Min</span><span>Max</span></div>
+          </div>
+          <div class="control-group">
+            <label>Output Format</label>
+            <div class="format-pills" id="compressFormatPills">
+              <button class="pill active" data-val="jpeg">JPEG</button>
+              <button class="pill" data-val="webp">WebP</button>
+              <button class="pill" data-val="png">PNG</button>
+            </div>
+          </div>
+          <div class="control-group inline">
+            <label>Progressive JPEG</label>
+            <label class="toggle">
+              <input type="checkbox" id="progressiveToggle" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+        <button class="action-btn" id="compressBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Compress All Images
+        </button>
+      </div>
+
+      <!-- CONVERT -->
+      <div class="tool-panel" id="panel-convert">
+        <div class="panel-header">
+          <h2>Convert <span class="panel-tag">Change format</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="control-group">
+            <label>Target Format</label>
+            <div class="format-grid" id="convertFormatGrid">
+              <button class="fmt-btn active" data-fmt="image/webp" data-ext="webp">WebP</button>
+              <button class="fmt-btn" data-fmt="image/jpeg" data-ext="jpg">JPEG</button>
+              <button class="fmt-btn" data-fmt="image/png" data-ext="png">PNG</button>
+              <button class="fmt-btn" data-fmt="image/bmp" data-ext="bmp">BMP</button>
+              <button class="fmt-btn" data-fmt="image/gif" data-ext="gif">GIF</button>
+              <button class="fmt-btn" data-fmt="image/x-icon" data-ext="ico">ICO</button>
+              <button class="fmt-btn" data-fmt="image/avif" data-ext="avif">AVIF</button>
+              <button class="fmt-btn" data-fmt="image/tiff" data-ext="tiff">TIFF</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Quality <span class="ctrl-val" id="convertQualVal">90%</span></label>
+            <input type="range" id="convertQualSlider" min="10" max="100" value="90" class="slider" />
+          </div>
+          <div class="control-group inline">
+            <label>Preserve Metadata</label>
+            <label class="toggle">
+              <input type="checkbox" id="metaToggle" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+        <button class="action-btn" id="convertBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+          Convert All Images
+        </button>
+      </div>
+
+      <!-- RESIZE -->
+      <div class="tool-panel" id="panel-resize">
+        <div class="panel-header">
+          <h2>Resize <span class="panel-tag">Change dimensions</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="control-row">
+            <div class="control-group">
+              <label>Width (px)</label>
+              <input type="number" id="resizeW" placeholder="e.g. 1920" class="num-input" min="1" />
+            </div>
+            <div class="lock-icon" id="lockAspect" title="Lock aspect ratio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            </div>
+            <div class="control-group">
+              <label>Height (px)</label>
+              <input type="number" id="resizeH" placeholder="e.g. 1080" class="num-input" min="1" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Preset Sizes</label>
+            <div class="preset-chips">
+              <button class="chip" data-w="1920" data-h="1080">1920×1080</button>
+              <button class="chip" data-w="1280" data-h="720">1280×720</button>
+              <button class="chip" data-w="800" data-h="600">800×600</button>
+              <button class="chip" data-w="512" data-h="512">512×512</button>
+              <button class="chip" data-w="256" data-h="256">256×256</button>
+              <button class="chip" data-w="128" data-h="128">128×128</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Interpolation</label>
+            <div class="format-pills">
+              <button class="pill active" data-val="smooth" id="resizeMethod">Smooth</button>
+              <button class="pill" data-val="pixelated">Pixelated</button>
+            </div>
+          </div>
+          <div class="control-group inline">
+            <label>Lock Aspect Ratio</label>
+            <label class="toggle">
+              <input type="checkbox" id="aspectToggle" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+        <button class="action-btn" id="resizeBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          Resize All Images
+        </button>
+      </div>
+
+      <!-- CROP -->
+      <div class="tool-panel" id="panel-crop">
+        <div class="panel-header">
+          <h2>Crop <span class="panel-tag">Trim & aspect ratio</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="control-group">
+            <label>Aspect Ratio</label>
+            <div class="preset-chips">
+              <button class="chip active" data-ar="free">Free</button>
+              <button class="chip" data-ar="1:1">1:1</button>
+              <button class="chip" data-ar="4:3">4:3</button>
+              <button class="chip" data-ar="16:9">16:9</button>
+              <button class="chip" data-ar="3:2">3:2</button>
+              <button class="chip" data-ar="2:3">2:3</button>
+              <button class="chip" data-ar="9:16">9:16</button>
+            </div>
+          </div>
+          <div class="crop-preview-area" id="cropPreviewArea">
+            <div class="crop-placeholder">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M16 8v-4M8 16H4M40 32h4M32 40v4"/></svg>
+              <p>Select a single image to crop</p>
+            </div>
+          </div>
+          <div class="control-row" id="cropInputs">
+            <div class="control-group">
+              <label>X</label>
+              <input type="number" id="cropX" value="0" class="num-input" min="0" />
+            </div>
+            <div class="control-group">
+              <label>Y</label>
+              <input type="number" id="cropY" value="0" class="num-input" min="0" />
+            </div>
+            <div class="control-group">
+              <label>Width</label>
+              <input type="number" id="cropW" value="100" class="num-input" min="1" />
+            </div>
+            <div class="control-group">
+              <label>Height</label>
+              <input type="number" id="cropH" value="100" class="num-input" min="1" />
+            </div>
+          </div>
+        </div>
+        <button class="action-btn" id="cropBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"/></svg>
+          Apply Crop
+        </button>
+      </div>
+
+      <!-- FILTER -->
+      <div class="tool-panel" id="panel-filter">
+        <div class="panel-header">
+          <h2>Filter <span class="panel-tag">Adjust & effects</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="filter-grid">
+            <div class="control-group">
+              <label>Brightness <span class="ctrl-val" id="brightnessVal">100%</span></label>
+              <input type="range" id="brightnessSlider" min="0" max="200" value="100" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Contrast <span class="ctrl-val" id="contrastVal">100%</span></label>
+              <input type="range" id="contrastSlider" min="0" max="200" value="100" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Saturation <span class="ctrl-val" id="saturationVal">100%</span></label>
+              <input type="range" id="saturationSlider" min="0" max="200" value="100" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Blur <span class="ctrl-val" id="blurVal">0px</span></label>
+              <input type="range" id="blurSlider" min="0" max="20" value="0" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Hue Rotate <span class="ctrl-val" id="hueVal">0°</span></label>
+              <input type="range" id="hueSlider" min="0" max="360" value="0" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Grayscale <span class="ctrl-val" id="grayVal">0%</span></label>
+              <input type="range" id="graySlider" min="0" max="100" value="0" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Sepia <span class="ctrl-val" id="sepiaVal">0%</span></label>
+              <input type="range" id="sepiaSlider" min="0" max="100" value="0" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Invert <span class="ctrl-val" id="invertVal">0%</span></label>
+              <input type="range" id="invertSlider" min="0" max="100" value="0" class="slider" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Quick Presets</label>
+            <div class="preset-chips">
+              <button class="chip" data-preset="none">None</button>
+              <button class="chip" data-preset="grayscale">B&W</button>
+              <button class="chip" data-preset="vintage">Vintage</button>
+              <button class="chip" data-preset="vivid">Vivid</button>
+              <button class="chip" data-preset="cold">Cold</button>
+              <button class="chip" data-preset="warm">Warm</button>
+              <button class="chip" data-preset="dramatic">Dramatic</button>
+            </div>
+          </div>
+        </div>
+        <button class="action-btn" id="filterBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Apply Filters
+        </button>
+      </div>
+
+      <!-- WATERMARK -->
+      <div class="tool-panel" id="panel-watermark">
+        <div class="panel-header">
+          <h2>Watermark <span class="panel-tag">Protect your images</span></h2>
+        </div>
+        <div class="panel-controls">
+          <div class="control-group">
+            <label>Watermark Text</label>
+            <input type="text" id="wmText" placeholder="© Your Name 2025" class="text-input" />
+          </div>
+          <div class="control-row">
+            <div class="control-group">
+              <label>Font Size <span class="ctrl-val" id="wmSizeVal">24px</span></label>
+              <input type="range" id="wmSize" min="10" max="120" value="24" class="slider" />
+            </div>
+            <div class="control-group">
+              <label>Opacity <span class="ctrl-val" id="wmOpacVal">50%</span></label>
+              <input type="range" id="wmOpacity" min="5" max="100" value="50" class="slider" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Position</label>
+            <div class="position-grid" id="wmPosition">
+              <button class="pos-btn" data-pos="top-left">↖</button>
+              <button class="pos-btn" data-pos="top-center">↑</button>
+              <button class="pos-btn" data-pos="top-right">↗</button>
+              <button class="pos-btn" data-pos="middle-left">←</button>
+              <button class="pos-btn active" data-pos="center">✦</button>
+              <button class="pos-btn" data-pos="middle-right">→</button>
+              <button class="pos-btn" data-pos="bottom-left">↙</button>
+              <button class="pos-btn" data-pos="bottom-center">↓</button>
+              <button class="pos-btn" data-pos="bottom-right">↘</button>
+            </div>
+          </div>
+          <div class="control-group inline">
+            <label>Tile (Repeat)</label>
+            <label class="toggle">
+              <input type="checkbox" id="wmTile" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="control-group">
+            <label>Color</label>
+            <div class="color-row">
+              <input type="color" id="wmColor" value="#ffffff" class="color-pick" />
+              <span id="wmColorHex">#ffffff</span>
+            </div>
+          </div>
+        </div>
+        <button class="action-btn" id="watermarkBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Apply Watermark
+        </button>
+      </div>
+
+    </section>
+
+    <!-- File Queue & Results -->
+    <section class="queue-section" id="queueSection" style="display:none">
+      <div class="queue-header">
+        <h3>Image Queue <span id="queueCount" class="queue-badge">0</span></h3>
+        <div class="queue-actions">
+          <button class="ghost-btn" id="downloadAllBtn" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Download All
+          </button>
+        </div>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </section>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script src="compress.js"></script>
+  <script src="convert.js"></script>
+  <script src="resize.js"></script>
+  <script src="crop.js"></script>
+  <script src="filter.js"></script>
+  <script src="watermark.js"></script>
+</body>
+</html>
