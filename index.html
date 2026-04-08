@@ -15,7 +15,7 @@
       <span class="logo-npr">NPR</span><span class="logo-img">IMG</span>
       <div class="logo-dot"></div>
     </div>
-    <nav class="nav">
+    <nav class="nav" id="desktopNav">
       <button class="nav-btn active" data-tab="compress">Compress</button>
       <button class="nav-btn" data-tab="convert">Convert</button>
       <button class="nav-btn" data-tab="resize">Resize</button>
@@ -28,6 +28,34 @@
       <span>JS-Powered</span>
     </div>
   </header>
+
+  <!-- Mobile Bottom Tab Bar (shown only on small screens) -->
+  <nav class="bottom-tab-bar" id="bottomTabBar">
+    <button class="btab active" data-tab="compress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Compress</span>
+    </button>
+    <button class="btab" data-tab="convert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+      <span>Convert</span>
+    </button>
+    <button class="btab" data-tab="resize">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      <span>Resize</span>
+    </button>
+    <button class="btab" data-tab="crop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"/></svg>
+      <span>Crop</span>
+    </button>
+    <button class="btab" data-tab="filter">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span>Filter</span>
+    </button>
+    <button class="btab" data-tab="watermark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Watermark</span>
+    </button>
+  </nav>
 
   <!-- Main -->
   <main class="main">
@@ -153,99 +181,160 @@
         <div class="panel-header">
           <h2>Resize <span class="panel-tag">Change dimensions</span></h2>
         </div>
-        <div class="panel-controls">
-          <div class="control-row">
-            <div class="control-group">
-              <label>Width (px)</label>
-              <input type="number" id="resizeW" placeholder="e.g. 1920" class="num-input" min="1" />
+        <div class="preview-tool-layout">
+          <!-- Left: Preview -->
+          <div class="preview-col">
+            <div class="preview-box" id="resizePreviewBox">
+              <div class="preview-empty" id="resizePreviewEmpty">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <p>Upload an image to preview</p>
+              </div>
+              <canvas id="resizeCanvas" style="display:none;max-width:100%;max-height:100%;border-radius:6px;"></canvas>
+              <div class="preview-info-bar" id="resizeInfoBar" style="display:none">
+                <span id="resizeOrigDim">—</span>
+                <span class="pi-arrow">→</span>
+                <span id="resizeNewDim" class="pi-accent">—</span>
+              </div>
             </div>
-            <div class="lock-icon" id="lockAspect" title="Lock aspect ratio">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
-            </div>
-            <div class="control-group">
-              <label>Height (px)</label>
-              <input type="number" id="resizeH" placeholder="e.g. 1080" class="num-input" min="1" />
-            </div>
-          </div>
-          <div class="control-group">
-            <label>Preset Sizes</label>
-            <div class="preset-chips">
-              <button class="chip" data-w="1920" data-h="1080">1920×1080</button>
-              <button class="chip" data-w="1280" data-h="720">1280×720</button>
-              <button class="chip" data-w="800" data-h="600">800×600</button>
-              <button class="chip" data-w="512" data-h="512">512×512</button>
-              <button class="chip" data-w="256" data-h="256">256×256</button>
-              <button class="chip" data-w="128" data-h="128">128×128</button>
+            <!-- Image selector for preview -->
+            <div class="preview-img-selector" id="resizeImgSelector" style="display:none">
+              <span class="pis-label">Preview image:</span>
+              <div class="pis-thumbs" id="resizePisThumbs"></div>
             </div>
           </div>
-          <div class="control-group">
-            <label>Interpolation</label>
-            <div class="format-pills">
-              <button class="pill active" data-val="smooth" id="resizeMethod">Smooth</button>
-              <button class="pill" data-val="pixelated">Pixelated</button>
+          <!-- Right: Controls -->
+          <div class="controls-col">
+            <div class="panel-controls">
+              <div class="control-row">
+                <div class="control-group">
+                  <label>Width (px)</label>
+                  <input type="number" id="resizeW" placeholder="e.g. 1920" class="num-input" min="1" />
+                </div>
+                <div class="lock-icon locked" id="lockAspect" title="Lock aspect ratio">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+                </div>
+                <div class="control-group">
+                  <label>Height (px)</label>
+                  <input type="number" id="resizeH" placeholder="e.g. 1080" class="num-input" min="1" />
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Preset Sizes</label>
+                <div class="preset-chips">
+                  <button class="chip" data-w="1920" data-h="1080">1920×1080</button>
+                  <button class="chip" data-w="1280" data-h="720">1280×720</button>
+                  <button class="chip" data-w="800" data-h="600">800×600</button>
+                  <button class="chip" data-w="512" data-h="512">512×512</button>
+                  <button class="chip" data-w="256" data-h="256">256×256</button>
+                  <button class="chip" data-w="128" data-h="128">128×128</button>
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Interpolation</label>
+                <div class="format-pills">
+                  <button class="pill active" data-val="smooth">Smooth</button>
+                  <button class="pill" data-val="pixelated">Pixelated</button>
+                </div>
+              </div>
+              <div class="control-group inline">
+                <label>Lock Aspect Ratio</label>
+                <label class="toggle">
+                  <input type="checkbox" id="aspectToggle" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
             </div>
-          </div>
-          <div class="control-group inline">
-            <label>Lock Aspect Ratio</label>
-            <label class="toggle">
-              <input type="checkbox" id="aspectToggle" checked />
-              <span class="toggle-track"></span>
-            </label>
+            <button class="action-btn" id="resizeBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              Resize All Images
+            </button>
           </div>
         </div>
-        <button class="action-btn" id="resizeBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-          Resize All Images
-        </button>
       </div>
 
       <!-- CROP -->
       <div class="tool-panel" id="panel-crop">
         <div class="panel-header">
-          <h2>Crop <span class="panel-tag">Trim & aspect ratio</span></h2>
+          <h2>Crop <span class="panel-tag">Drag to select area</span></h2>
         </div>
-        <div class="panel-controls">
-          <div class="control-group">
-            <label>Aspect Ratio</label>
-            <div class="preset-chips">
-              <button class="chip active" data-ar="free">Free</button>
-              <button class="chip" data-ar="1:1">1:1</button>
-              <button class="chip" data-ar="4:3">4:3</button>
-              <button class="chip" data-ar="16:9">16:9</button>
-              <button class="chip" data-ar="3:2">3:2</button>
-              <button class="chip" data-ar="2:3">2:3</button>
-              <button class="chip" data-ar="9:16">9:16</button>
+        <div class="preview-tool-layout">
+          <!-- Left: Interactive Crop Canvas -->
+          <div class="preview-col crop-preview-col">
+            <div class="crop-stage" id="cropStage">
+              <div class="crop-empty" id="cropEmpty">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M16 8v-4M8 16H4M40 32h4M32 40v4"/></svg>
+                <p>Upload an image to start cropping</p>
+              </div>
+              <canvas id="cropCanvas"></canvas>
+            </div>
+            <!-- Image selector -->
+            <div class="preview-img-selector" id="cropImgSelector" style="display:none">
+              <span class="pis-label">Select image to crop:</span>
+              <div class="pis-thumbs" id="cropPisThumbs"></div>
+            </div>
+            <!-- Crop info -->
+            <div class="crop-info-row" id="cropInfoRow" style="display:none">
+              <span class="ci-item">X: <b id="ciX">0</b></span>
+              <span class="ci-item">Y: <b id="ciY">0</b></span>
+              <span class="ci-item">W: <b id="ciW">0</b></span>
+              <span class="ci-item">H: <b id="ciH">0</b></span>
+              <span class="ci-item accent">→ <b id="ciOut">—</b></span>
             </div>
           </div>
-          <div class="crop-preview-area" id="cropPreviewArea">
-            <div class="crop-placeholder">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M16 8v-4M8 16H4M40 32h4M32 40v4"/></svg>
-              <p>Select a single image to crop</p>
+          <!-- Right: Controls -->
+          <div class="controls-col">
+            <div class="panel-controls">
+              <div class="control-group">
+                <label>Aspect Ratio</label>
+                <div class="preset-chips">
+                  <button class="chip active" data-ar="free">Free</button>
+                  <button class="chip" data-ar="1:1">1:1</button>
+                  <button class="chip" data-ar="4:3">4:3</button>
+                  <button class="chip" data-ar="16:9">16:9</button>
+                  <button class="chip" data-ar="3:2">3:2</button>
+                  <button class="chip" data-ar="2:3">2:3</button>
+                  <button class="chip" data-ar="9:16">9:16</button>
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Manual Coordinates <span class="ctrl-hint">auto-synced with drag</span></label>
+                <div class="control-row">
+                  <div class="control-group">
+                    <label>X</label>
+                    <input type="number" id="cropX" value="0" class="num-input" min="0" />
+                  </div>
+                  <div class="control-group">
+                    <label>Y</label>
+                    <input type="number" id="cropY" value="0" class="num-input" min="0" />
+                  </div>
+                </div>
+                <div class="control-row">
+                  <div class="control-group">
+                    <label>Width</label>
+                    <input type="number" id="cropW" value="100" class="num-input" min="1" />
+                  </div>
+                  <div class="control-group">
+                    <label>Height</label>
+                    <input type="number" id="cropH" value="100" class="num-input" min="1" />
+                  </div>
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Quick Presets</label>
+                <div class="preset-chips">
+                  <button class="chip" id="cropPresetFull">Full Image</button>
+                  <button class="chip" id="cropPresetCenter">Center 50%</button>
+                  <button class="chip" id="cropPresetTop">Top Half</button>
+                  <button class="chip" id="cropPresetBottom">Bottom Half</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="control-row" id="cropInputs">
-            <div class="control-group">
-              <label>X</label>
-              <input type="number" id="cropX" value="0" class="num-input" min="0" />
-            </div>
-            <div class="control-group">
-              <label>Y</label>
-              <input type="number" id="cropY" value="0" class="num-input" min="0" />
-            </div>
-            <div class="control-group">
-              <label>Width</label>
-              <input type="number" id="cropW" value="100" class="num-input" min="1" />
-            </div>
-            <div class="control-group">
-              <label>Height</label>
-              <input type="number" id="cropH" value="100" class="num-input" min="1" />
-            </div>
+            <button class="action-btn" id="cropBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"/></svg>
+              Apply Crop to All
+            </button>
           </div>
         </div>
-        <button class="action-btn" id="cropBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"/></svg>
-          Apply Crop
-        </button>
       </div>
 
       <!-- FILTER -->
@@ -253,113 +342,206 @@
         <div class="panel-header">
           <h2>Filter <span class="panel-tag">Adjust & effects</span></h2>
         </div>
-        <div class="panel-controls">
-          <div class="filter-grid">
-            <div class="control-group">
-              <label>Brightness <span class="ctrl-val" id="brightnessVal">100%</span></label>
-              <input type="range" id="brightnessSlider" min="0" max="200" value="100" class="slider" />
+        <div class="preview-tool-layout">
+          <!-- Left: Live Preview -->
+          <div class="preview-col">
+            <div class="preview-box" id="filterPreviewBox">
+              <div class="preview-empty" id="filterPreviewEmpty">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="24" cy="24" r="10"/><path d="M24 4v4M24 40v4M4 24h4M40 24h4"/></svg>
+                <p>Upload an image to preview filters</p>
+              </div>
+              <img id="filterPreviewImg" style="display:none;max-width:100%;max-height:100%;border-radius:6px;transition:filter 0.1s;" />
+              <div class="preview-split-label" id="filterSplitMode" style="display:none">
+                <span>Original</span><span>Filtered</span>
+              </div>
             </div>
-            <div class="control-group">
-              <label>Contrast <span class="ctrl-val" id="contrastVal">100%</span></label>
-              <input type="range" id="contrastSlider" min="0" max="200" value="100" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Saturation <span class="ctrl-val" id="saturationVal">100%</span></label>
-              <input type="range" id="saturationSlider" min="0" max="200" value="100" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Blur <span class="ctrl-val" id="blurVal">0px</span></label>
-              <input type="range" id="blurSlider" min="0" max="20" value="0" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Hue Rotate <span class="ctrl-val" id="hueVal">0°</span></label>
-              <input type="range" id="hueSlider" min="0" max="360" value="0" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Grayscale <span class="ctrl-val" id="grayVal">0%</span></label>
-              <input type="range" id="graySlider" min="0" max="100" value="0" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Sepia <span class="ctrl-val" id="sepiaVal">0%</span></label>
-              <input type="range" id="sepiaSlider" min="0" max="100" value="0" class="slider" />
-            </div>
-            <div class="control-group">
-              <label>Invert <span class="ctrl-val" id="invertVal">0%</span></label>
-              <input type="range" id="invertSlider" min="0" max="100" value="0" class="slider" />
+            <div class="preview-img-selector" id="filterImgSelector" style="display:none">
+              <span class="pis-label">Preview image:</span>
+              <div class="pis-thumbs" id="filterPisThumbs"></div>
             </div>
           </div>
-          <div class="control-group">
-            <label>Quick Presets</label>
-            <div class="preset-chips">
-              <button class="chip" data-preset="none">None</button>
-              <button class="chip" data-preset="grayscale">B&W</button>
-              <button class="chip" data-preset="vintage">Vintage</button>
-              <button class="chip" data-preset="vivid">Vivid</button>
-              <button class="chip" data-preset="cold">Cold</button>
-              <button class="chip" data-preset="warm">Warm</button>
-              <button class="chip" data-preset="dramatic">Dramatic</button>
+          <!-- Right: Controls -->
+          <div class="controls-col">
+            <div class="panel-controls">
+              <div class="filter-grid">
+                <div class="control-group">
+                  <label>Brightness <span class="ctrl-val" id="brightnessVal">100%</span></label>
+                  <input type="range" id="brightnessSlider" min="0" max="200" value="100" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Contrast <span class="ctrl-val" id="contrastVal">100%</span></label>
+                  <input type="range" id="contrastSlider" min="0" max="200" value="100" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Saturation <span class="ctrl-val" id="saturationVal">100%</span></label>
+                  <input type="range" id="saturationSlider" min="0" max="200" value="100" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Blur <span class="ctrl-val" id="blurVal">0px</span></label>
+                  <input type="range" id="blurSlider" min="0" max="20" value="0" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Hue Rotate <span class="ctrl-val" id="hueVal">0°</span></label>
+                  <input type="range" id="hueSlider" min="0" max="360" value="0" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Grayscale <span class="ctrl-val" id="grayVal">0%</span></label>
+                  <input type="range" id="graySlider" min="0" max="100" value="0" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Sepia <span class="ctrl-val" id="sepiaVal">0%</span></label>
+                  <input type="range" id="sepiaSlider" min="0" max="100" value="0" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Invert <span class="ctrl-val" id="invertVal">0%</span></label>
+                  <input type="range" id="invertSlider" min="0" max="100" value="0" class="slider" />
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Quick Presets</label>
+                <div class="preset-chips">
+                  <button class="chip" data-preset="none">None</button>
+                  <button class="chip" data-preset="grayscale">B&W</button>
+                  <button class="chip" data-preset="vintage">Vintage</button>
+                  <button class="chip" data-preset="vivid">Vivid</button>
+                  <button class="chip" data-preset="cold">Cold</button>
+                  <button class="chip" data-preset="warm">Warm</button>
+                  <button class="chip" data-preset="dramatic">Dramatic</button>
+                </div>
+              </div>
             </div>
+            <button class="action-btn" id="filterBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              Apply Filters to All
+            </button>
           </div>
         </div>
-        <button class="action-btn" id="filterBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          Apply Filters
-        </button>
       </div>
 
       <!-- WATERMARK -->
       <div class="tool-panel" id="panel-watermark">
         <div class="panel-header">
-          <h2>Watermark <span class="panel-tag">Protect your images</span></h2>
+          <h2>Watermark <span class="panel-tag">Drag to position</span></h2>
         </div>
-        <div class="panel-controls">
-          <div class="control-group">
-            <label>Watermark Text</label>
-            <input type="text" id="wmText" placeholder="© Your Name 2025" class="text-input" />
-          </div>
-          <div class="control-row">
-            <div class="control-group">
-              <label>Font Size <span class="ctrl-val" id="wmSizeVal">24px</span></label>
-              <input type="range" id="wmSize" min="10" max="120" value="24" class="slider" />
+        <div class="preview-tool-layout">
+          <!-- Left: Drag Preview Canvas -->
+          <div class="preview-col">
+            <div class="wm-stage-wrap">
+              <div class="wm-stage" id="wmStage">
+                <div class="preview-empty" id="wmPreviewEmpty">
+                  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 44s16-8 16-20V10L24 4 8 10v14c0 12 16 20 16 20z"/></svg>
+                  <p>Upload an image to preview</p>
+                </div>
+                <canvas id="wmCanvas"></canvas>
+                <!-- Draggable watermark overlay -->
+                <div class="wm-overlay" id="wmOverlay" style="display:none">
+                  <div class="wm-drag-handle" id="wmDragHandle">
+                    <span id="wmPreviewLabel">© Watermark</span>
+                    <img id="wmPreviewPhoto" style="display:none;max-width:120px;max-height:60px;opacity:0.7;" />
+                  </div>
+                </div>
+              </div>
+              <p class="wm-drag-hint" id="wmDragHint" style="display:none">
+                <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 1a1 1 0 011 1v4h4a1 1 0 010 2H9v4a1 1 0 01-2 0V8H3a1 1 0 010-2h4V2a1 1 0 011-1z"/></svg>
+                Drag watermark to reposition
+              </p>
             </div>
-            <div class="control-group">
-              <label>Opacity <span class="ctrl-val" id="wmOpacVal">50%</span></label>
-              <input type="range" id="wmOpacity" min="5" max="100" value="50" class="slider" />
+            <div class="preview-img-selector" id="wmImgSelector" style="display:none">
+              <span class="pis-label">Preview image:</span>
+              <div class="pis-thumbs" id="wmPisThumbs"></div>
             </div>
           </div>
-          <div class="control-group">
-            <label>Position</label>
-            <div class="position-grid" id="wmPosition">
-              <button class="pos-btn" data-pos="top-left">↖</button>
-              <button class="pos-btn" data-pos="top-center">↑</button>
-              <button class="pos-btn" data-pos="top-right">↗</button>
-              <button class="pos-btn" data-pos="middle-left">←</button>
-              <button class="pos-btn active" data-pos="center">✦</button>
-              <button class="pos-btn" data-pos="middle-right">→</button>
-              <button class="pos-btn" data-pos="bottom-left">↙</button>
-              <button class="pos-btn" data-pos="bottom-center">↓</button>
-              <button class="pos-btn" data-pos="bottom-right">↘</button>
+          <!-- Right: Controls -->
+          <div class="controls-col">
+            <div class="panel-controls">
+              <!-- Type toggle -->
+              <div class="control-group">
+                <label>Watermark Type</label>
+                <div class="format-pills" id="wmTypePills">
+                  <button class="pill active" data-wt="text">Text</button>
+                  <button class="pill" data-wt="photo">Photo / Logo</button>
+                </div>
+              </div>
+
+              <!-- Text controls -->
+              <div id="wmTextControls">
+                <div class="control-group">
+                  <label>Text</label>
+                  <input type="text" id="wmText" placeholder="© Your Name 2025" class="text-input" />
+                </div>
+                <div class="control-group">
+                  <label>Font Size <span class="ctrl-val" id="wmSizeVal">32px</span></label>
+                  <input type="range" id="wmSize" min="10" max="200" value="32" class="slider" />
+                </div>
+                <div class="control-group">
+                  <label>Color</label>
+                  <div class="color-row">
+                    <input type="color" id="wmColor" value="#ffffff" class="color-pick" />
+                    <span id="wmColorHex">#ffffff</span>
+                    <div class="wm-color-presets">
+                      <button class="wm-color-swatch" style="background:#fff" data-c="#ffffff"></button>
+                      <button class="wm-color-swatch" style="background:#000" data-c="#000000"></button>
+                      <button class="wm-color-swatch" style="background:#48f955" data-c="#48f955"></button>
+                      <button class="wm-color-swatch" style="background:#ff4d4d" data-c="#ff4d4d"></button>
+                      <button class="wm-color-swatch" style="background:#f9a048" data-c="#f9a048"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo controls -->
+              <div id="wmPhotoControls" style="display:none">
+                <div class="control-group">
+                  <label>Logo / Watermark Image</label>
+                  <label class="upload-small-btn" for="wmPhotoInput">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    Upload Logo / Photo
+                  </label>
+                  <input type="file" id="wmPhotoInput" accept="image/*" hidden />
+                  <div class="wm-photo-preview" id="wmPhotoThumb" style="display:none">
+                    <img id="wmPhotoThumbImg" />
+                    <button class="wm-photo-remove" id="wmPhotoRemove">✕</button>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label>Logo Size <span class="ctrl-val" id="wmPhotoSizeVal">20%</span></label>
+                  <input type="range" id="wmPhotoSize" min="5" max="80" value="20" class="slider" />
+                </div>
+              </div>
+
+              <!-- Common controls -->
+              <div class="control-group">
+                <label>Opacity <span class="ctrl-val" id="wmOpacVal">70%</span></label>
+                <input type="range" id="wmOpacity" min="5" max="100" value="70" class="slider" />
+              </div>
+              <div class="control-group inline">
+                <label>Tile / Repeat Pattern</label>
+                <label class="toggle">
+                  <input type="checkbox" id="wmTile" />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="control-group">
+                <label>Position <span class="ctrl-hint">or drag on preview</span></label>
+                <div class="position-grid" id="wmPositionGrid">
+                  <button class="pos-btn" data-pos="top-left">↖</button>
+                  <button class="pos-btn" data-pos="top-center">↑</button>
+                  <button class="pos-btn" data-pos="top-right">↗</button>
+                  <button class="pos-btn" data-pos="middle-left">←</button>
+                  <button class="pos-btn active" data-pos="center">✦</button>
+                  <button class="pos-btn" data-pos="middle-right">→</button>
+                  <button class="pos-btn" data-pos="bottom-left">↙</button>
+                  <button class="pos-btn" data-pos="bottom-center">↓</button>
+                  <button class="pos-btn" data-pos="bottom-right">↘</button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="control-group inline">
-            <label>Tile (Repeat)</label>
-            <label class="toggle">
-              <input type="checkbox" id="wmTile" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="control-group">
-            <label>Color</label>
-            <div class="color-row">
-              <input type="color" id="wmColor" value="#ffffff" class="color-pick" />
-              <span id="wmColorHex">#ffffff</span>
-            </div>
+            <button class="action-btn" id="watermarkBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Apply Watermark to All
+            </button>
           </div>
         </div>
-        <button class="action-btn" id="watermarkBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Apply Watermark
-        </button>
       </div>
 
     </section>

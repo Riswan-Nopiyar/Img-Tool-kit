@@ -30,15 +30,21 @@ const downloadAllBtn = document.getElementById('downloadAllBtn');
 const toastCont    = document.getElementById('toastContainer');
 
 // ===================== TABS =====================
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-' + tab)?.classList.add('active');
-    state.activeTab = tab;
+function switchTab(tab) {
+  document.querySelectorAll('.nav-btn, .btab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
   });
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab)?.classList.add('active');
+  state.activeTab = tab;
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+document.querySelectorAll('.btab').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
 // ===================== UPLOAD =====================
@@ -88,6 +94,7 @@ function handleFiles(files) {
     updateQueue();
     toast(`${added} image${added > 1 ? 's' : ''} added`, 'success');
     fileInput.value = '';
+    window.dispatchEvent(new CustomEvent('nprimg:filesChanged'));
   }
 }
 
@@ -151,6 +158,7 @@ function removeFile(id) {
   document.getElementById(`file-${id}`)?.remove();
   updateStats();
   updateQueue();
+  window.dispatchEvent(new CustomEvent('nprimg:filesChanged'));
 }
 
 function clearAll() {
@@ -164,7 +172,11 @@ function clearAll() {
   updateQueue();
 }
 
-clearAllBtn.addEventListener('click', () => { clearAll(); toast('Queue cleared', 'info'); });
+clearAllBtn.addEventListener('click', () => {
+  clearAll();
+  toast('Queue cleared', 'info');
+  window.dispatchEvent(new CustomEvent('nprimg:filesChanged'));
+});
 
 // ===================== UPDATE UI =====================
 function updateStats() {
